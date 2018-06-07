@@ -5,4 +5,4 @@ Method developed by Tiago Dantas and Fernando Cyrino Oliveira that combines Bagg
 
 - This work can be seen as an extension of the work from Christoph Bergmeir, Rob Hyndman and José Benítez called "Bagging exponential smoothing methods using STL decomposition and Box–Cox transformation". Therefore, this code uses parts of the BaggedETS R function from the **forecast** package. 
 
-- **Warning:** The code use functions to make parallel computations (currently just working in unix based os).
+- **Warning:** The code uses functions to make parallel computations (currently just working in unix based os).
