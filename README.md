@@ -3,4 +3,4 @@ Method developed by Tiago Dantas and Fernando Cyrino Oliveira that combines Bagg
 
 - The Paper called "**Improving Time Series Forecasting: an Approach Combining Bootstrap Aggregation, Clusters and Exponential Smoothing**" describing the entire approach has been accepted for publication in the International Journal of Forecasting.
 
-- As an extension of the work of Christoph Bergmeir, Rob Hyndman and José Benítez, this code uses parts of the BaggedETS R function from the **forecast** package. 
+- This work can be seen as an extension of the work from Christoph Bergmeir, Rob Hyndman and José Benítez called "Bagging exponential smoothing methods using STL decomposition and Box–Cox transformation". Therefore, this code uses parts of the BaggedETS R function from the **forecast** package. However the code use functions to make parallel computations (currently just woring in unix based os).
