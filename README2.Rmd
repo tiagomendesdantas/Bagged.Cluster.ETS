@@ -1,3 +1,29 @@
+---
+title: "Bagged.Cluster.ETS"
+author: "Tiago Dantas"
+date: "08/06/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Method developed by <a href="https://www.linkedin.com/in/tiagomendesdantas/"> Tiago Dantas</a> and <a href="http://www.ind.puc-rio.br/en/equipe/fernando-luiz-cyrino-oliveira/"> Fernando Cyrino Oliveira</a> that combines Bagging, Clusters and ETS to produce highly accurate time series forecasts.
+
+# The method
+Bagging Exponential Smoothing procedures have recently arisen as an innovative way to improve forecast accuracy. The idea is to use Bootstrap to generate multiple versions of the time series and, subsequently, apply an Exponential Smoothing (ETS) method to produce forecasts for each of them. The final result is obtained aggregating the forecasts. The main drawback of existing procedures is that Bagging itself does not avoid generating highly correlated ensembles that might affect the forecast error. Bagged.Cluster.ETS enhance existing Bagging Exponential Smoothing methods by an addition of a clustering phase. The general idea is to generate Bootstrapped versions of the series and use clusters to select series that are less similar among each other. The expectation is that this would reduce the covariance and, consequently, the forecast error.
+
+- The Paper called "**Improving Time Series Forecasting: an Approach Combining Bootstrap Aggregation, Clusters and Exponential Smoothing**" describing the entire approach has been accepted for publication in the *International Journal of Forecasting* (forthcoming).
+
+- Check the presentation of the method at International Symposium on Forecasting 2017 (Cairns- Australia) with results on the M3-Competition <a href="https://forecasters.org/wp-content/uploads/gravity_forms/7-c6dd08fee7f0065037affb5b74fec20a/2017/07/isf2017_tiago_fernando_simple3.pdf">here</a>.
+
+- This work can be seen as an extension of the work from Christoph Bergmeir, Rob Hyndman and José Benítez called "Bagging exponential smoothing methods using STL decomposition and Box–Cox transformation". Therefore, this code uses parts of the BaggedETS R function from the **forecast** package. 
+
+- **Warning:** The code uses functions to make parallel computations (currently just working in unix based os).
+
+
+```{r car, echo=FALSE}
 library(forecast)
 library(parallel)
 library(TSclust)
@@ -48,7 +74,7 @@ bld.mbb.bootstrap<-function (x, num, block_size = if (frequency(x) > 1) 2 * freq
 
 
 
-baggedETS2<-function (y,cores=detectCores()-1,nclusters=5,distance="EUCL",silhouette=F,
+baggedClusterETS<-function (y,cores=detectCores()-1,nclusters=5,distance="EUCL",silhouette=F,
                       h_pseudo = ifelse(frequency(object$x) > 1, 2 * frequency(object$x), 
                                                          10),
                       bootstrapped_series = bld.mbb.bootstrap(y, 1000), 
@@ -164,16 +190,16 @@ baggedETS2<-function (y,cores=detectCores()-1,nclusters=5,distance="EUCL",silhou
   out$residuals <- out$y - out$fitted
   out$series <- deparse(substitute(y))
   out$k<-k.best
-  out$method <- "baggedETS"
+  out$method <- "baggedClusterETS"
   out$call <- match.call()
-  return(structure(out, class = c("baggedETS")))
+  return(structure(out, class = c("baggedClusterETS")))
 }
 
 
 
 
 
-forecast.baggedETS2<-function (object, cores=detectCores()-1,h = ifelse(frequency(object$x) > 1, 2 * frequency(object$x), 
+forecast.baggedClusterETS<-function (object, cores=detectCores()-1,h = ifelse(frequency(object$x) > 1, 2 * frequency(object$x), 
                              10), ...) 
 {
   out <- list(model = object, series = object$series, x = object$y, 
@@ -200,9 +226,15 @@ forecast.baggedETS2<-function (object, cores=detectCores()-1,h = ifelse(frequenc
   out
 }
 
+```
+
+```{r cars}
+model<-baggedClusterETS(USAccDeaths,silhouette = T,h_pseudo = 12,cores=4)
+future<-forecast(model,h=12)
+```
 
 
-
-
-
+```{r pressure, echo=FALSE}
+plot(future$median)
+```
 
